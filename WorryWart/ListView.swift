@@ -22,12 +22,14 @@ struct ListView: View {
                             Text("Assignment #\($0)")
                         }
                         .foregroundStyle(.red)
+                        .bold()
                     }
                     Section(header: Text("Completed")) {
                         ForEach(11..<16) {
                             Text("Assignment #\($0)")
                         }
                         .foregroundStyle(.secondary)
+                        .strikethrough()
                     }
                 }
                 .scrollContentBackground(.hidden)
