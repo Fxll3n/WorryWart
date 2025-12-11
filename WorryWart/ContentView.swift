@@ -8,17 +8,9 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var selection: Int = 0
     var body: some View {
-        NavigationStack {
-            VStack {
-                Image(systemName: "globe")
-                    .imageScale(.large)
-                    .foregroundStyle(.tint)
-                Text("Hello, world!")
-            }
-            .padding()
-        }
-        .navigationBarBackButtonHidden()
+        Text("Hello World!")
     }
 }
 
