@@ -6,17 +6,20 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ListView: View {
+    @Environment(\.modelContext) var context
+    @Query private var assignments: [Assignment]
+    
     @State private var searchText: String = ""
     
-    var allItems: [String] {
-        (1...16).map { "Assignment #\($0)" } // Temp Data
-    }
-    
-    var searchResults: [String] {
-        guard !searchText.isEmpty else { return [] } // Return Empty Array if not searhing for anything
-        return allItems.filter { $0.localizedCaseInsensitiveContains(searchText) } // Filters items by searchText
+    private var searchResults: [Assignment] {
+        if searchText.isEmpty {
+            return assignments
+        } else {
+            return assignments.filter { $0.name.contains(searchText) }
+        }
     }
     
     var body: some View {
@@ -25,25 +28,34 @@ struct ListView: View {
                 List {
                     if !searchText.isEmpty {
                         ForEach(searchResults, id: \.self) { item in
-                            Text(item)
+                            ListItemView(data: item)
                         }
                     } else {
                         Section(header: Text("Due Soon")) {
-                            ForEach(allItems.prefix(5), id: \.self) { item in
-                                Text(item)
+                            ForEach(assignments, id: \.self) { assignment in
+                                if !(assignment.dueDate?.timeIntervalSinceNow ?? 0 < 0 || assignment.isCompleted) {
+                                    ListItemView(data: assignment)
+                                }
                             }
+                            .onDelete(perform: deleteItems)
                         }
                         Section(header: Text("Past Due")) {
-                            ForEach(allItems[5..<10], id: \.self) { item in
-                                Text(item)
+                            ForEach(assignments, id: \.self) { assignment in
+                                if (assignment.dueDate?.timeIntervalSinceNow ?? 0 < 0 && !assignment.isCompleted) {
+                                    ListItemView(data: assignment)
+                                }
                             }
+                            .onDelete(perform: deleteItems)
                             .foregroundStyle(.red)
                             .bold()
                         }
                         Section(header: Text("Completed")) {
-                            ForEach(allItems[10..<16], id: \.self) { item in
-                                Text(item)
+                            ForEach(assignments, id: \.self) { assignment in
+                                if assignment.isCompleted {
+                                    ListItemView(data: assignment)
+                                }
                             }
+                            .onDelete(perform: deleteItems)
                             .foregroundStyle(.secondary)
                             .strikethrough()
                         }
@@ -53,6 +65,12 @@ struct ListView: View {
                 .scrollContentBackground(.hidden)
             }
             .background(.background.secondary)
+        }
+    }
+    func deleteItems(at offsets: IndexSet) {
+        for index in offsets {
+            let assignment = assignments[index]
+            context.delete(assignment)
         }
     }
 }

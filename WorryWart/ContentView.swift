@@ -6,9 +6,14 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
+    @Environment(\.modelContext) var context
+    @Query private var assignments: [Assignment]
+    
     @State private var selection: Int = 0
+    @State private var isPresented: Bool = false
     var body: some View {
             NavigationStack {
                 VStack {
@@ -21,6 +26,9 @@ struct ContentView: View {
                         Text("Oops! Something went wrong")
                     }
                 }
+                .sheet(isPresented: $isPresented){
+                    AddAssignmentView()
+                }
                 .toolbarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .principal) {
@@ -31,6 +39,18 @@ struct ContentView: View {
                         .frame(minWidth: 220, idealWidth: 240, maxWidth: 300, alignment: .center)
                         .pickerStyle(.segmented)
                         .padding(.vertical)
+                    }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        NavigationLink(destination: SettingsView()) {
+                            Image(systemName: "gearshape")
+                        }
+                    }
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button(action: {
+                            isPresented.toggle()
+                        }, label: {
+                            Image(systemName: "plus")
+                        })
                     }
                 }
             }
