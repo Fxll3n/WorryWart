@@ -14,15 +14,29 @@ class Assignment
     var name: String
     var desc: String
     var isCompleted: Bool = false
+    var course: Course?
     var dueDate: Date?
     
-    init(name: String, desc: String, isCompleted: Bool, dueDate: Date? = nil) {
+    init(name: String, desc: String, isCompleted: Bool, course: Course? = nil, dueDate: Date? = nil) {
         self.name = name
         self.desc = desc
         self.isCompleted = isCompleted
+        self.course = course
         self.dueDate = dueDate
     }
     
+}
+
+@Model
+class Course
+{
+    var name: String
+    var assignments: [Assignment]
+    
+    init(name: String, assignments: [Assignment]) {
+        self.name = name
+        self.assignments = assignments
+    }
 }
 
 struct ListItemView: View {
@@ -34,8 +48,18 @@ struct ListItemView: View {
                     .font(.headline)
                 Text(data.desc)
                     .font(.subheadline)
-                if let due = data.dueDate {
-                    HStack {
+                HStack {
+                    if let course = data.course {
+                        Text("\(course.name)")
+                            .foregroundStyle(.blue)
+                            .padding(.horizontal, 5.0)
+                            .bold()
+                            .background(.quinary)
+                            .clipShape(RoundedRectangle(cornerRadius: 5.0))
+                    } else {
+                        EmptyView()
+                    }
+                    if let due = data.dueDate {
                         Text("\(due.formatted(Date.FormatStyle().month(.abbreviated).day(.twoDigits)))")
                             .foregroundStyle(.blue)
                             .padding(.horizontal, 5.0)
@@ -48,14 +72,10 @@ struct ListItemView: View {
                             .bold()
                             .background(.quinary)
                             .clipShape(RoundedRectangle(cornerRadius: 5.0))
+                    } else {
+                        EmptyView()
                     }
-                } else {
-                    Text("None")
-                        .foregroundStyle(.blue)
-                        .padding(.horizontal, 5.0)
-                        .bold()
-                        .background(.quinary)
-                        .clipShape(RoundedRectangle(cornerRadius: 5.0))
+                    
                 }
             }
             Spacer()
@@ -68,5 +88,9 @@ struct ListItemView: View {
 }
 
 #Preview {
-    ListItemView(data: Assignment(name: "Math Homework", desc: "Blah blah blah", isCompleted: false, dueDate: nil))
+    List {
+        
+        ListItemView(data: Assignment(name: "Math Homework", desc: "Blah blah blah", isCompleted: false, course: Course(name: "AP PRECALC", assignments: []), dueDate: Date.now))
+        ListItemView(data: Assignment(name: "Math Homework", desc: "Blah blah blah", isCompleted: false, course: nil, dueDate: nil))
+    }
 }
