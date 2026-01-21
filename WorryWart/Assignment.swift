@@ -8,34 +8,70 @@
 import SwiftUI
 import SwiftData
 
+import SwiftUI
+import SwiftData
+
 @Model
-class Assignment
-{
+class Assignment {
     var name: String
     var desc: String
-    var isCompleted: Bool = false
-    var course: Course?
+    var isCompleted: Bool
     var dueDate: Date?
     
-    init(name: String, desc: String, isCompleted: Bool, course: Course? = nil, dueDate: Date? = nil) {
+    var course: Course?
+    
+    init(name: String, desc: String, isCompleted: Bool = false, course: Course? = nil, dueDate: Date? = nil) {
         self.name = name
         self.desc = desc
         self.isCompleted = isCompleted
         self.course = course
         self.dueDate = dueDate
     }
-    
 }
 
 @Model
-class Course
-{
+class Course {
     var name: String
+    
+    @Relationship(deleteRule: .cascade, inverse: \Assignment.course)
     var assignments: [Assignment]
     
-    init(name: String, assignments: [Assignment]) {
+    init(name: String, assignments: [Assignment] = []) {
         self.name = name
         self.assignments = assignments
+    }
+}
+
+enum AssignmentSearchToken: Identifiable, Hashable {
+    case course(Course)
+    case dueDate(Date)
+    case completed
+    case incomplete
+    
+    var id: String {
+        switch self {
+        case .course(let course):
+            return "course-\(course.name)"
+        case .dueDate(let date):
+            return "date-\(date.timeIntervalSince1970)"
+        case .completed:
+            return "completed"
+        case .incomplete:
+            return "incomplete"
+        }
+    }
+    
+    var displayText: String {
+        switch self {
+        case .course(let course):
+            return course.name
+        case .dueDate(let date):
+            return date.formatted(date: .abbreviated, time: .omitted)
+        case .completed:
+            return "Completed"
+        case .incomplete:
+            return "Incomplete"
+        }
     }
 }
 
