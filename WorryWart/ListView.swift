@@ -67,7 +67,7 @@ struct ListView: View {
     }
     
     var isSearching: Bool {
-        (!searchText.isEmpty || !searchTokens.isEmpty)
+        !searchText.isEmpty || !searchTokens.isEmpty
     }
     
     var body: some View {
@@ -134,35 +134,35 @@ struct ListView: View {
             ) { token in
                 Label(token.displayText, systemImage: tokenIcon(for: token))
             }
-            .searchSuggestions {
-                if searchText.isEmpty && searchTokens.isEmpty {
-                    if !courses.isEmpty {
-                        Section("Courses") {
-                            ForEach(courses) { course in
-                                Button {
-                                    searchTokens.append(.course(course))
-                                } label: {
-                                    Label(course.name, systemImage: "book.fill")
-                                }
-                            }
-                        }
-                    }
-                    
-                    Section("Status") {
-                        Button {
-                            searchTokens.append(.completed)
-                        } label: {
-                            Label("Completed", systemImage: "checkmark.circle.fill")
-                        }
-                        
-                        Button {
-                            searchTokens.append(.incomplete)
-                        } label: {
-                            Label("Incomplete", systemImage: "circle")
-                        }
-                    }
-                }
-            }
+//            .searchSuggestions { // For some reason causes UI to be rendered behind when it shouldn't
+//                if searchText.isEmpty && searchTokens.isEmpty {
+//                    if !courses.isEmpty {
+//                        Section("Courses") {
+//                            ForEach(courses) { course in
+//                                Button {
+//                                    searchTokens.append(.course(course))
+//                                } label: {
+//                                    Label(course.name, systemImage: "book.fill")
+//                                }
+//                            }
+//                        }
+//                    }
+//                    
+//                    Section("Status") {
+//                        Button {
+//                            searchTokens.append(.completed)
+//                        } label: {
+//                            Label("Completed", systemImage: "checkmark.circle.fill")
+//                        }
+//                        
+//                        Button {
+//                            searchTokens.append(.incomplete)
+//                        } label: {
+//                            Label("Incomplete", systemImage: "circle")
+//                        }
+//                    }
+//                }
+//            }
             .scrollContentBackground(.hidden)
             .background(Color(.systemGroupedBackground))
         }
@@ -181,7 +181,6 @@ struct ListView: View {
         }
     }
     
-    // Delete from a specific filtered array
     private func deleteItems(from array: [Assignment], at offsets: IndexSet) {
         for index in offsets {
             let assignment = array[index]
@@ -189,7 +188,6 @@ struct ListView: View {
         }
     }
     
-    // Delete from filtered search results
     private func deleteFilteredItems(at offsets: IndexSet) {
         for index in offsets {
             let assignment = filteredAssignments[index]
