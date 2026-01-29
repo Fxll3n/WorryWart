@@ -13,48 +13,58 @@ struct ContentView: View {
     @Query private var assignments: [Assignment]
     
     @State private var selection: Int = 0
-    @State private var isPresented: Bool = false
+    @State private var isAssignmentPresented: Bool = false
+    @State private var isCoursePresented: Bool = false
     var body: some View {
-            NavigationStack {
-                VStack {
-                    switch selection {
-                    case 0:
-                        ListView()
-                    case 1:
-                        Text("Not Implemented Yet!")
-                    default:
-                        Text("Oops! Something went wrong")
+        NavigationStack {
+            VStack {
+                switch selection {
+                case 0:
+                    ListView()
+                case 1:
+                    Text("Not Implemented Yet!")
+                default:
+                    Text("Oops! Something went wrong")
+                }
+            }
+            .sheet(isPresented: $isAssignmentPresented){
+                AddAssignmentView()
+            }
+            .sheet(isPresented: $isCoursePresented){
+                AddCourseView()
+            }
+            .toolbarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Picker("", selection: $selection) {
+                        Text("List").tag(0)
+                        Text("Calendar").tag(1)
+                    }
+                    .frame(minWidth: 220, idealWidth: 240, maxWidth: 300, alignment: .center)
+                    .pickerStyle(.segmented)
+                    .padding(.vertical)
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    NavigationLink(destination: SettingsView()) {
+                        Image(systemName: "gearshape")
                     }
                 }
-                .sheet(isPresented: $isPresented){
-                    AddAssignmentView()
-                }
-                .toolbarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        Picker("", selection: $selection) {
-                            Text("List").tag(0)
-                            Text("Calendar").tag(1)
+                ToolbarItem(placement: .navigationBarLeading) {
+                    
+                    Menu {
+                        Button("Add Assignment") {
+                            isAssignmentPresented.toggle()
                         }
-                        .frame(minWidth: 220, idealWidth: 240, maxWidth: 300, alignment: .center)
-                        .pickerStyle(.segmented)
-                        .padding(.vertical)
-                    }
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        NavigationLink(destination: SettingsView()) {
-                            Image(systemName: "gearshape")
+                        Button("Add Course") {
+                            isCoursePresented.toggle()
                         }
-                    }
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Button(action: {
-                            isPresented.toggle()
-                        }, label: {
-                            Image(systemName: "plus")
-                        })
+                    } label: {
+                        Image(systemName: "plus")
                     }
                 }
             }
-            .navigationBarBackButtonHidden()
+        }
+        .navigationBarBackButtonHidden()
     }
 }
 

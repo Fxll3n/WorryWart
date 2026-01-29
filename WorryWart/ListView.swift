@@ -134,35 +134,42 @@ struct ListView: View {
             ) { token in
                 Label(token.displayText, systemImage: tokenIcon(for: token))
             }
-//            .searchSuggestions { // For some reason causes UI to be rendered behind when it shouldn't
-//                if searchText.isEmpty && searchTokens.isEmpty {
-//                    if !courses.isEmpty {
-//                        Section("Courses") {
-//                            ForEach(courses) { course in
-//                                Button {
-//                                    searchTokens.append(.course(course))
-//                                } label: {
-//                                    Label(course.name, systemImage: "book.fill")
-//                                }
-//                            }
-//                        }
-//                    }
-//                    
-//                    Section("Status") {
-//                        Button {
-//                            searchTokens.append(.completed)
-//                        } label: {
-//                            Label("Completed", systemImage: "checkmark.circle.fill")
-//                        }
-//                        
-//                        Button {
-//                            searchTokens.append(.incomplete)
-//                        } label: {
-//                            Label("Incomplete", systemImage: "circle")
-//                        }
-//                    }
-//                }
-//            }
+            .searchSuggestions { // For some reason stops UI code execution in the BG
+                if searchText.isEmpty && searchTokens.isEmpty {
+                        ZStack {
+                            Color(.systemBackground)
+                                .ignoresSafeArea()
+                            
+                            List {
+                                if !courses.isEmpty {
+                                    Section("Courses") {
+                                        ForEach(courses) { course in
+                                            Button {
+                                                searchTokens.append(.course(course))
+                                            } label: {
+                                                Label(course.name, systemImage: "book.fill")
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                Section("Status") {
+                                    Button {
+                                        searchTokens.append(.completed)
+                                    } label: {
+                                        Label("Completed", systemImage: "checkmark.circle.fill")
+                                    }
+                                    
+                                    Button {
+                                        searchTokens.append(.incomplete)
+                                    } label: {
+                                        Label("Incomplete", systemImage: "circle")
+                                    }
+                                }
+                            }
+                        }
+                    }
+            }
             .scrollContentBackground(.hidden)
             .background(Color(.systemGroupedBackground))
         }

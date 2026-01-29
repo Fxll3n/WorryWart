@@ -14,6 +14,6 @@ struct WorryWartApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(for: Assignment.self)
+        .modelContainer(for: [Course.self, Assignment.self])
     }
 }

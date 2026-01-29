@@ -34,7 +34,7 @@ class Course {
     var name: String
     
     @Relationship(deleteRule: .cascade, inverse: \Assignment.course)
-    var assignments: [Assignment]
+    var assignments: [Assignment]?
     
     init(name: String, assignments: [Assignment] = []) {
         self.name = name
