@@ -10,7 +10,7 @@ import SwiftData
 
 struct SettingsView: View {
     // Would have preffered @AppStorage but it doesn't accept String Arrays as of writing
-    @State private var listOrder = UserDefaults.standard.stringArray(forKey: "listOrder")!
+    @State private var listOrder = UserDefaults.standard.stringArray(forKey: "listOrder") ?? []
     
     @Environment(\.modelContext) var context
     @Query private var courses: [Course]
@@ -44,7 +44,7 @@ struct SettingsView: View {
             .toolbar{ EditButton() }
         }
         .onAppear() {
-            listOrder = UserDefaults.standard.stringArray(forKey: "listOrder")!
+            listOrder = UserDefaults.standard.stringArray(forKey: "listOrder") ?? []
             
             if listOrder.isEmpty { // Will only run the first time the app is run.
                 UserDefaults.standard.set(["Due Soon", "Past Due", "Completed"], forKey: "listOrder")

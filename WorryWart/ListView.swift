@@ -15,6 +15,7 @@ struct ListView: View {
     
     @State private var searchText: String = ""
     @State private var searchTokens: [AssignmentSearchToken] = []
+    @State private var listOrder: [String] = UserDefaults.standard.stringArray(forKey: "listOrder") ?? ["Due Soon", "Past Due", "Completed"]
     
     var dueSoonAssignments: [Assignment] {
         assignments.filter { assignment in
@@ -82,37 +83,40 @@ struct ListView: View {
                     }
                 } else {
                     Group {
-                        if !dueSoonAssignments.isEmpty {
-                            Section(header: Text("Due Soon")) {
-                                ForEach(dueSoonAssignments) { assignment in
-                                    ListItemView(data: assignment)
-                                }
-                                .onDelete { offsets in
-                                    deleteItems(from: dueSoonAssignments, at: offsets)
-                                }
-                            }
-                        }
-                        
-                        if !pastDueAssignments.isEmpty {
-                            Section(header: Text("Past Due")) {
-                                ForEach(pastDueAssignments) { assignment in
-                                    ListItemView(data: assignment)
-                                        .foregroundStyle(.red)
-                                }
-                                .onDelete { offsets in
-                                    deleteItems(from: pastDueAssignments, at: offsets)
+                        ForEach(listOrder, id: \.self) { list in
+                            if !dueSoonAssignments.isEmpty && list == "Due Soon" {
+                                Section(header: Text("Due Soon")) {
+                                    ForEach(dueSoonAssignments) { assignment in
+                                        ListItemView(data: assignment)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    .onDelete { offsets in
+                                        deleteItems(from: dueSoonAssignments, at: offsets)
+                                    }
                                 }
                             }
-                        }
-                        
-                        if !completedAssignments.isEmpty {
-                            Section(header: Text("Completed")) {
-                                ForEach(completedAssignments) { assignment in
-                                    ListItemView(data: assignment)
-                                        .foregroundStyle(.secondary)
+                            
+                            else if !pastDueAssignments.isEmpty && list == "Past Due" {
+                                Section(header: Text("Past Due")) {
+                                    ForEach(pastDueAssignments) { assignment in
+                                        ListItemView(data: assignment)
+                                            .foregroundStyle(.red)
+                                    }
+                                    .onDelete { offsets in
+                                        deleteItems(from: pastDueAssignments, at: offsets)
+                                    }
                                 }
-                                .onDelete { offsets in
-                                    deleteItems(from: completedAssignments, at: offsets)
+                            }
+                            
+                            else if !completedAssignments.isEmpty && list == "Completed" {
+                                Section(header: Text("Completed")) {
+                                    ForEach(completedAssignments) { assignment in
+                                        ListItemView(data: assignment)
+                                            .foregroundStyle(.green)
+                                    }
+                                    .onDelete { offsets in
+                                        deleteItems(from: completedAssignments, at: offsets)
+                                    }
                                 }
                             }
                         }
@@ -126,6 +130,8 @@ struct ListView: View {
                         }
                     }
                 }
+            }.onAppear {
+                listOrder = UserDefaults.standard.stringArray(forKey: "listOrder") ?? ["Due Soon", "Past Due", "Completed"]
             }
             .searchable(
                 text: $searchText,
@@ -136,38 +142,31 @@ struct ListView: View {
             }
             .searchSuggestions { // For some reason stops UI code execution in the BG
                 if searchText.isEmpty && searchTokens.isEmpty {
-                        ZStack {
-                            Color(.systemBackground)
-                                .ignoresSafeArea()
-                            
-                            List {
-                                if !courses.isEmpty {
-                                    Section("Courses") {
-                                        ForEach(courses) { course in
-                                            Button {
-                                                searchTokens.append(.course(course))
-                                            } label: {
-                                                Label(course.name, systemImage: "book.fill")
-                                            }
-                                        }
-                                    }
-                                }
-                                
-                                Section("Status") {
-                                    Button {
-                                        searchTokens.append(.completed)
-                                    } label: {
-                                        Label("Completed", systemImage: "checkmark.circle.fill")
-                                    }
-                                    
-                                    Button {
-                                        searchTokens.append(.incomplete)
-                                    } label: {
-                                        Label("Incomplete", systemImage: "circle")
-                                    }
+                    if !courses.isEmpty {
+                        Section("Courses") {
+                            ForEach(courses) { course in
+                                Button {
+                                    searchTokens.append(.course(course))
+                                } label: {
+                                    Label(course.name, systemImage: "book.fill")
                                 }
                             }
                         }
+                    }
+                    
+                    Section("Status") {
+                        Button {
+                            searchTokens.append(.completed)
+                        } label: {
+                            Label("Completed", systemImage: "checkmark.circle.fill")
+                        }
+                        
+                        Button {
+                            searchTokens.append(.incomplete)
+                        } label: {
+                            Label("Incomplete", systemImage: "circle")
+                        }
+                    }
                     }
             }
             .scrollContentBackground(.hidden)
