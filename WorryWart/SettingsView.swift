@@ -15,7 +15,10 @@ struct SettingsView: View {
 
     // Would have preffered @AppStorage but it doesn't accept String Arrays as of writing
     @State private var listOrder = UserDefaults.standard.stringArray(forKey: "listOrder") ?? []
-    @AppStorage("enableAlternateListStyle") var enableAlternateListStyle: Bool = false
+    
+    @AppStorage("enableAlternateListStyle") private var enableAlternateListStyle: Bool = false
+    @AppStorage("calendarViewType") private var calendarViewType: String = "week"
+    @AppStorage("enableAlternateCalendarSwitcher") private var enableAltCalSwitcher: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -35,16 +38,26 @@ struct SettingsView: View {
                 
                 Section(header: Text("List Order")) {
                     ForEach(listOrder, id: \.self) { item in
-                        Label(item, systemImage: "arrow.2.circlepath.circle")
+                        HStack {
+                            Label(item, systemImage: "arrow.2.circlepath.circle")
+                            Spacer()
+                            Image(systemName: "line.3.horizontal")
+                                .foregroundStyle(.secondary)
+                                
+                        }
                     }
                     .onMove (perform: moveItems)
                 }
-                Section(header: Text("")){
+                Section(header: Text("Preferences")){
                     Toggle("Enable Alternate List Style", isOn: $enableAlternateListStyle)
+                    Toggle("Enable Alternate Calendar Switcher", isOn: $enableAltCalSwitcher)
+                    Picker("Calendar View Type", selection: $calendarViewType) {
+                        Text("Week").tag("week")
+                        Text("Month").tag("month")
+                    }.disabled(enableAltCalSwitcher)
                 }
             }
             .navigationTitle("Settings")
-            .toolbar{ EditButton() }
         }
         .onAppear() {
             listOrder = UserDefaults.standard.stringArray(forKey: "listOrder") ?? []

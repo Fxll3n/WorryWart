@@ -13,6 +13,8 @@ struct ContentView: View {
     @Query private var assignments: [Assignment]
     
     @AppStorage("enableAlternateListStyle") var enableAlternateListStyle: Bool = false
+    @AppStorage("calendarViewType") var calendarViewType: String = "week"
+    @AppStorage("enableAlternateCalendarSwitcher") private var enableAltCalSwitcher: Bool = false
     
     @State private var selection: Int = 0
     @State private var isAssignmentPresented: Bool = false
@@ -30,7 +32,18 @@ struct ContentView: View {
                         ListView()
                     }
                 case 1:
-                    Text("Not Implemented Yet!")
+                    if enableAltCalSwitcher {
+                        
+                    } else {
+                        switch calendarViewType {
+                        case "week":
+                            WeekCalendarView()
+                        case "month":
+                            MonthCalendarView()
+                        default:
+                            WeekCalendarView()
+                        }
+                    }
                 default:
                     Text("Oops! Something went wrong")
                 }
