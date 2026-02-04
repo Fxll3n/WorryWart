@@ -1,21 +1,21 @@
 //
-//  ListView.swift
+//  ListViewAlternative.swift
 //  WorryWart
 //
-//  Created by Angel Bitsov on 12/11/25.
+//  Created by Angel Bitsov on 2/2/26.
 //
 
 import SwiftUI
 import SwiftData
 
-struct ListView: View {
+struct ListViewAlternative: View {
     @Environment(\.modelContext) var context
     @Query private var courses: [Course]
     @Query private var assignments: [Assignment]
     
     @State private var searchText: String = ""
     @State private var searchTokens: [AssignmentSearchToken] = []
-    @State private var listOrder: [String] = UserDefaults.standard.stringArray(forKey: "listOrder") ?? ["Due Soon", "Past Due", "Completed"]
+    @State private var selectedList: Int = 0
     
     var dueSoonAssignments: [Assignment] {
         assignments.filter { assignment in
@@ -70,70 +70,55 @@ struct ListView: View {
     var isSearching: Bool {
         !searchText.isEmpty || !searchTokens.isEmpty
     }
-    
     var body: some View {
         NavigationStack {
             List {
-                if isSearching {
-                    ForEach(filteredAssignments) { assignment in
-                        ListItemView(data: assignment)
-                    }
-                    .onDelete { offsets in
-                        deleteFilteredItems(at: offsets)
-                    }
-                } else {
-                    Group {
-                        ForEach(listOrder, id: \.self) { list in
-                            if !dueSoonAssignments.isEmpty && list == "Due Soon" {
-                                Section(header: Text("Due Soon")) {
-                                    ForEach(dueSoonAssignments) { assignment in
-                                        ListItemView(data: assignment)
-                                            .foregroundStyle(.secondary)
-                                    }
-                                    .onDelete { offsets in
-                                        deleteItems(from: dueSoonAssignments, at: offsets)
-                                    }
-                                }
-                            }
-                            
-                            else if !pastDueAssignments.isEmpty && list == "Past Due" {
-                                Section(header: Text("Past Due")) {
-                                    ForEach(pastDueAssignments) { assignment in
-                                        ListItemView(data: assignment)
-                                            .foregroundStyle(.red)
-                                    }
-                                    .onDelete { offsets in
-                                        deleteItems(from: pastDueAssignments, at: offsets)
-                                    }
-                                }
-                            }
-                            
-                            else if !completedAssignments.isEmpty && list == "Completed" {
-                                Section(header: Text("Completed")) {
-                                    ForEach(completedAssignments) { assignment in
-                                        ListItemView(data: assignment)
-                                            .foregroundStyle(.green)
-                                    }
-                                    .onDelete { offsets in
-                                        deleteItems(from: completedAssignments, at: offsets)
-                                    }
-                                }
-                            }
+                if !dueSoonAssignments.isEmpty && selectedList == 0 {
+                    Section(header: Text("Due Soon")) {
+                        ForEach(dueSoonAssignments) { assignment in
+                            ListItemView(data: assignment)
+                                .foregroundStyle(.secondary)
                         }
-                        
-                        if assignments.isEmpty {
-                            ContentUnavailableView(
-                                "No Assignments",
-                                systemImage: "tray",
-                                description: Text("Add your first assignment to get started")
-                            )
+                        .onDelete { offsets in
+                            deleteItems(from: dueSoonAssignments, at: offsets)
                         }
                     }
                 }
-            }.onAppear {
-                listOrder = UserDefaults.standard.stringArray(forKey: "listOrder") ?? ["Due Soon", "Past Due", "Completed"]
+                
+                else if !pastDueAssignments.isEmpty && selectedList == 1 {
+                    Section(header: Text("Past Due")) {
+                        ForEach(pastDueAssignments) { assignment in
+                            ListItemView(data: assignment)
+                                .foregroundStyle(.red)
+                        }
+                        .onDelete { offsets in
+                            deleteItems(from: pastDueAssignments, at: offsets)
+                        }
+                    }
+                }
+                
+                else if !completedAssignments.isEmpty && selectedList == 2 {
+                    Section(header: Text("Completed")) {
+                        ForEach(completedAssignments) { assignment in
+                            ListItemView(data: assignment)
+                                .foregroundStyle(.green)
+                        }
+                        .onDelete { offsets in
+                            deleteItems(from: completedAssignments, at: offsets)
+                        }
+                    }
+                }
             }
-            .searchable(
+            .toolbar {
+                ToolbarItem(placement: .bottomBar) {
+                    Picker("", selection: $selectedList) {
+                        Text("Due Soon").tag(0)
+                        Text("Past Due").tag(1)
+                        Text("Completed").tag(2)
+                    }
+                    .pickerStyle(.segmented)
+                }
+            }.searchable(
                 text: $searchText,
                 tokens: $searchTokens,
                 placement: .navigationBarDrawer
@@ -173,7 +158,6 @@ struct ListView: View {
             .background(Color(.systemGroupedBackground))
         }
     }
-    
     private func tokenIcon(for token: AssignmentSearchToken) -> String {
         switch token {
         case .course:
@@ -186,7 +170,6 @@ struct ListView: View {
             return "circle"
         }
     }
-    
     private func deleteItems(from array: [Assignment], at offsets: IndexSet) {
         for index in offsets {
             let assignment = array[index]
@@ -203,6 +186,6 @@ struct ListView: View {
 }
 
 #Preview {
-    ListView()
+    ListViewAlternative()
         .modelContainer(for: [Course.self, Assignment.self])
 }

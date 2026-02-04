@@ -9,13 +9,13 @@ import SwiftUI
 import SwiftData
 
 struct SettingsView: View {
-    // Would have preffered @AppStorage but it doesn't accept String Arrays as of writing
-    @State private var listOrder = UserDefaults.standard.stringArray(forKey: "listOrder") ?? []
-    
     @Environment(\.modelContext) var context
     @Query private var courses: [Course]
     @Query private var assignments: [Assignment]
 
+    // Would have preffered @AppStorage but it doesn't accept String Arrays as of writing
+    @State private var listOrder = UserDefaults.standard.stringArray(forKey: "listOrder") ?? []
+    @AppStorage("enableAlternateListStyle") var enableAlternateListStyle: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -38,6 +38,9 @@ struct SettingsView: View {
                         Label(item, systemImage: "arrow.2.circlepath.circle")
                     }
                     .onMove (perform: moveItems)
+                }
+                Section(header: Text("")){
+                    Toggle("Enable Alternate List Style", isOn: $enableAlternateListStyle)
                 }
             }
             .navigationTitle("Settings")

@@ -12,15 +12,23 @@ struct ContentView: View {
     @Environment(\.modelContext) var context
     @Query private var assignments: [Assignment]
     
+    @AppStorage("enableAlternateListStyle") var enableAlternateListStyle: Bool = false
+    
     @State private var selection: Int = 0
     @State private var isAssignmentPresented: Bool = false
     @State private var isCoursePresented: Bool = false
+    
+    
     var body: some View {
         NavigationStack {
             VStack {
                 switch selection {
                 case 0:
-                    ListView()
+                    if enableAlternateListStyle {
+                        ListViewAlternative()
+                    } else {
+                        ListView()
+                    }
                 case 1:
                     Text("Not Implemented Yet!")
                 default:
