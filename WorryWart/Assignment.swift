@@ -32,12 +32,14 @@ class Assignment {
 @Model
 class Course {
     var name: String
+    var id: String
     
     @Relationship(deleteRule: .cascade, inverse: \Assignment.course)
     var assignments: [Assignment]?
     
-    init(name: String, assignments: [Assignment] = []) {
+    init(name: String, id: String = UUID().uuidString, assignments: [Assignment] = []) {
         self.name = name
+        self.id = id
         self.assignments = assignments
     }
 }
