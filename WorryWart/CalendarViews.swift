@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct WeekCalendarView: View {
     var body: some View {
@@ -16,56 +17,57 @@ struct WeekCalendarView: View {
 }
 
 struct MonthCalendarView: View {
-    let columnLayout = Array(repeating: GridItem(.flexible(minimum: 30, maximum: 50)), count: 7)
-    let weekDays: [String] = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    @Environment(\.modelContext) var context
+    
+    @Query var assignments: [Assignment] = []
+    
+    @State private var selectedDate: Date = Date()
+    
+    let columnLayout = Array(repeating: GridItem(.fixed(45)), count: 7)
+    
     var body: some View {
         VStack {
-            LazyVGrid(columns: columnLayout) {
-                ForEach(weekDays.indices, id: \.self) { day in
-                    Text(weekDays[day])
+            
+            Group {
+                LazyVGrid(columns: columnLayout) {
+                    
                 }
-            }
-            LazyVGrid(columns: columnLayout) {
-                ForEach(getDaysInCurrentMonth(), id: \.self) { day in
-                    RoundedRectangle(cornerRadius: 8)
-                        .frame(width: 50, height: 65)
-                        .foregroundStyle(isToday(num: day) ? .blue : .gray)
-                        .opacity(0.55)
-                        .overlay(
-                            Text("\(day)")
-                        )
-                }
-            }
-            List {
-                ForEach(1...24, id: \.self) { i in
-                    Section(header: Text("\(i):00")) {
-                        
+                LazyVGrid(columns: columnLayout) {
+                    ForEach(0..<32, id: \.self) { day in
+                        Text("\(day)")
+                            .font(.caption)
+                            .frame(width: 45, height: 45)
+                            .background(Color(.systemGray6))
+                            .cornerRadius(5)
                     }
                 }
             }
-            .scrollContentBackground(.hidden)
-        }.padding(10)
-    }
-    func getDaysInCurrentMonth() -> Range<Int> {
-        let now = Date()
-        let calendar = Calendar.current
-        let range = calendar.range(of: .day, in: .month, for: now)!
-        return range
+            .frame(minWidth: 100, idealWidth: 300, maxWidth: 400, minHeight: 100, idealHeight: 300, maxHeight:400, alignment: .center)
+            .padding()
+            .background(.white)
+            .cornerRadius(15)
+            
+            
+            Group {
+                List(assignments) { assignment in
+                    Text(assignment.name)
+                }
+                .scrollContentBackground(.hidden)
+                .padding(5)
+            }
+            .frame(minWidth: 100, idealWidth: 300, maxWidth: 400, minHeight: 100, idealHeight: 150, maxHeight:200, alignment: .center)
+            .padding()
+            .background(.white)
+            .cornerRadius(15)
+            
+        }
+        .frame(maxHeight: .infinity)
+        .padding(10)
+        .scrollContentBackground(.hidden)
+        .background(Color(.systemGroupedBackground))
+        
     }
     
-    func isToday(num: Int) -> Bool {
-        let now = Date()
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.year, .month, .day], from: now)
-        let date = calendar.date(from: components)!
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd"
-        
-        let currentDay = Int(dateFormatter.string(from: date))!
-        return num == currentDay
-    }
-        
 }
 
 struct AlternateCalendarView: View {
