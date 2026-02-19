@@ -32,14 +32,14 @@ class Assignment {
 @Model
 class Course {
     var name: String
-    var id: String
+//    var id: String // For Some reason adding this bricked the app? Not sure yet will investigate later on.
     
     @Relationship(deleteRule: .cascade, inverse: \Assignment.course)
     var assignments: [Assignment]?
     
-    init(name: String, id: String = UUID().uuidString, assignments: [Assignment] = []) {
+    init(name: String, /*id: String = UUID().uuidString, */assignments: [Assignment] = []) {
         self.name = name
-        self.id = id
+//        self.id = id
         self.assignments = assignments
     }
 }
