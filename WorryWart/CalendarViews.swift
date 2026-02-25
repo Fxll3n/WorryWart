@@ -9,10 +9,57 @@ import SwiftUI
 import SwiftData
 
 struct WeekCalendarView: View {
+    @Environment(\.modelContext) var context
+    
+    @Query var assignments: [Assignment] = []
+    
+    @State private var selectedDate: Date = Date()
+    
+    private var calendar: Calendar = Calendar.current
+    
+    private var datesInWeek: [Date] {
+        let calendar = Calendar.current
+        let today = Date.now
+        let startOfWeek = calendar.dateInterval(of: .weekOfYear, for: today)?.start ?? today
+        // Generate 7 days starting from startOfWeek
+        return (0..<7).compactMap { offset in
+            calendar.date(byAdding: .day, value: offset, to: startOfWeek)
+        }
+    }
+    
+    let rowLayout = Array(repeating: GridItem(.flexible(minimum: 45, maximum: 65)), count: 7)
+    
+    
+    
     var body: some View {
         VStack {
-            Text("Week Calendar View")
+            ScrollView {
+                HStack {
+                    LazyHGrid(rows: rowLayout, spacing: 20) {
+                        ForEach(datesInWeek, id: \.self) { date in
+                            Text("\(formatDate(date))")
+                                .font(.caption)
+                                .frame(width: 65, height: 65, alignment: .center)
+                                .background(Color(.systemGray6))
+                                .cornerRadius(5)
+                        }
+                    }
+                    .frame(minWidth: 10, idealWidth: 20, maxWidth: 80, minHeight: 300, idealHeight: 520, maxHeight: 700, alignment: .center)
+                    .background(.white)
+                    .cornerRadius(15)
+                    Spacer()
+                }
+            }
         }
+        .frame(maxHeight: .infinity)
+        .padding(10)
+        .scrollContentBackground(.hidden)
+        .background(Color(.systemGroupedBackground))
+    }
+    func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM\ndd"
+        return formatter.string(from: date)
     }
 }
 
@@ -211,9 +258,6 @@ struct AlternateCalendarView: View {
     }
 }
 
-#Preview {
-    AlternateCalendarView()
-}
 
 #Preview {
     MonthCalendarView()
