@@ -27,29 +27,55 @@ struct WeekCalendarView: View {
         }
     }
     
-    let rowLayout = Array(repeating: GridItem(.flexible(minimum: 45, maximum: 65)), count: 7)
+    private var assignemntsForDay: [Assignment] {
+        var result: [Assignment] = []
+        for assignment in assignments {
+            guard let dueDate = assignment.dueDate else { continue }
+            if calendar.isDate(dueDate, inSameDayAs: selectedDate) {
+                result.append(assignment)
+            }
+        }
+        return result
+    }
+    
+    let columnLayout = Array(repeating: GridItem(.flexible(minimum: 45, maximum: 55)), count: 7)
     
     
     
     var body: some View {
         VStack {
-            ScrollView {
-                HStack {
-                    LazyHGrid(rows: rowLayout, spacing: 20) {
-                        ForEach(datesInWeek, id: \.self) { date in
-                            Text("\(formatDate(date))")
-                                .font(.caption)
-                                .frame(width: 65, height: 65, alignment: .center)
-                                .background(Color(.systemGray6))
-                                .cornerRadius(5)
-                        }
+            HStack {
+                LazyVGrid(columns: columnLayout) {
+                    ForEach(datesInWeek, id: \.self) { day in
+                        Text(formatDate(day))
+                            .bold(isSameDay(Date(), day))
+                            .font(.system(size: isSameDay(Date(), day) ? 14 : 12))
+                            .foregroundStyle(isSameDay(Date(), day) ? .blue : .black)
+                            .frame(width: 45, height: 45, alignment: .center)
+                            .background(Color(.systemGray6))
+                            .cornerRadius(5)
+                            .onTapGesture {
+                                selectedDate = day
+                            }
+                            .overlay {
+                                if selectedDate == day {
+                                    Color.blue.opacity(0.1)
+                                } else {
+                                    Color.clear
+                                }
+                            }
                     }
-                    .frame(minWidth: 10, idealWidth: 20, maxWidth: 80, minHeight: 300, idealHeight: 520, maxHeight: 700, alignment: .center)
-                    .background(.white)
-                    .cornerRadius(15)
-                    Spacer()
                 }
+                .frame(minWidth: 100, idealWidth: 300, maxWidth: 400, minHeight: 10, idealHeight: 30, maxHeight: 35, alignment: .center)
+                .padding()
+                .background(.white)
+                .cornerRadius(15)
             }
+            
+            List(assignemntsForDay) { assignment in
+                Text("\(assignment.name)")
+            }
+            
         }
         .frame(maxHeight: .infinity)
         .padding(10)
@@ -60,6 +86,10 @@ struct WeekCalendarView: View {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMM\ndd"
         return formatter.string(from: date)
+    }
+    private func isSameDay(_ lhs: Date, _ rhs: Date) -> Bool {
+        let x = calendar.isDate(lhs, inSameDayAs: rhs)
+        return x
     }
 }
 
