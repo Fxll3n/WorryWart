@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		FC91E7542F5F241F000CB934 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = FC91E7532F5F241F000CB934 /* FirebaseCore */; };
+		FC91E7562F5F241F000CB934 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = FC91E7552F5F241F000CB934 /* FirebaseDatabase */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		14CBC4622EE88C7200A55633 /* WorryWart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WorryWart.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +28,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC91E7562F5F241F000CB934 /* FirebaseDatabase in Frameworks */,
+				FC91E7542F5F241F000CB934 /* FirebaseCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +72,8 @@
 			);
 			name = WorryWart;
 			packageProductDependencies = (
+				FC91E7532F5F241F000CB934 /* FirebaseCore */,
+				FC91E7552F5F241F000CB934 /* FirebaseDatabase */,
 			);
 			productName = WorryWart;
 			productReference = 14CBC4622EE88C7200A55633 /* WorryWart.app */;
@@ -94,6 +103,9 @@
 			);
 			mainGroup = 14CBC4592EE88C7200A55633;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				FC91E7522F5F241F000CB934 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 14CBC4632EE88C7200A55633 /* Products */;
 			projectDirPath = "";
@@ -357,6 +369,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		FC91E7522F5F241F000CB934 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.10.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		FC91E7532F5F241F000CB934 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FC91E7522F5F241F000CB934 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		FC91E7552F5F241F000CB934 /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FC91E7522F5F241F000CB934 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 14CBC45A2EE88C7200A55633 /* Project object */;
 }
