@@ -125,6 +125,10 @@ struct ListViewAlternative: View {
             ) { token in
                 Label(token.displayText, systemImage: tokenIcon(for: token))
             }
+            
+            .refreshable {
+                await refreshAssignments()
+            }
             .searchSuggestions { // For some reason stops UI code execution in the BG
                 if searchText.isEmpty && searchTokens.isEmpty {
                     if !courses.isEmpty {
@@ -181,6 +185,28 @@ struct ListViewAlternative: View {
         for index in offsets {
             let assignment = filteredAssignments[index]
             context.delete(assignment)
+        }
+    }
+    private func refreshAssignments() async {
+        do {
+            // For later when we need to pull from api and it might take long.
+            try await Task.sleep(for: .milliseconds(300))
+            
+            do {
+                try context.save()
+            } catch {
+                // Ignore save errors during refresh; UI will remain consistent with current context
+            }
+            
+            // Refresh any user-configurable settings that affect the list
+            await MainActor.run {
+                
+                // Nudge SwiftUI to recompute filtered sections if needed
+                searchText = searchText
+                searchTokens = searchTokens
+            }
+        } catch {
+            // If the Task was cancelled or sleep failed, just exit gracefully
         }
     }
 }
